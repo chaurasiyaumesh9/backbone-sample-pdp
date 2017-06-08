@@ -65,6 +65,10 @@ html,body{height:100%;}
 	background: #000;
 	color: #fff;
 }
+.swatch-content.options-color ul > li.active{
+	border: 1px solid red !important;
+
+}
 .swatch-content ul > li:not(:last-child){
 	border-right: 1px none #ccc;
 }
@@ -92,11 +96,22 @@ html,body{height:100%;}
 .swatch-content.options-color ul > li > a{
 	font-size:0;
 }
-
+.qtybox{
+	vertical-align: middle;
+}
 .qtybox input{
 	border:1px solid #ccc;
 	width: 36px;
 	height: 36px;
 	text-align: center;
 	line-height: 36px;
+	font-size:14px;
+}
+.btn.btn-add-to-cart{
+	border-radius: 0;
+	height: 36px;
+	line-height: 36px;
+	padding: 0 10px;
+	border: 0 none;
+	font-size:14px;
 }

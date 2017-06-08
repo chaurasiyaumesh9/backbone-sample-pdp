@@ -27,6 +27,7 @@
 						</div>
 						<div class="qtybox pull-left swatch-content">
 							<input type="text" value="1">
+							<button class="btn btn-primary btn-add-to-cart" > Add to Cart </button>
 						</div>
 						<div class="clearfix"></div>
 					</div>
@@ -61,7 +62,7 @@
 	<div class="options-size pull-left swatch-content">
 		<ul>
 			<% _.each(sizes, function(size){ %>
-	            <li> <a href="">  <%= size %> </a></li>
+	            <li class="<%= size.active?'active':'' %>"> <a href="">  <%= size.title %> </a></li>
 	        <% }); %>
 			
 		</ul>
@@ -75,7 +76,7 @@
 	<div class="options-color pull-left swatch-content">
 		<ul>
 			<% _.each(colors, function(color){ %>
-	            <li style="border-color:<%= color %>;"> <a href="" style="background:<%= color %>;">  <%= color %> </a></li>
+	            <li class="<%= color.active?'active':'' %>" style="border-color:<%= color.title %>;"> <a href="" style="background:<%= color.title %>;">  <%= color.title %> </a></li>
 	        <% }); %>
 		</ul>
 	</div>
@@ -86,16 +87,40 @@
 	var productData = new model({
 		title:"One Plus 3T",
 		sizes:[
-			"XS",
-			"S",
-			"M",
-			"L",
-			"XL"
+			{
+				title: "XS",
+				active: false
+			},
+			{
+				title: "S",
+				active: false
+			},
+			{
+				title: "M",
+				active: false
+			},
+			{
+				title: "L",
+				active: false
+			},
+			{
+				title: "XL",
+				active: false
+			}
 		],
 		colors:[
-			"goldenrod",
-			"Gray",
-			"Black"
+			{
+				title:"goldenrod",
+				active: false
+			},
+			{
+				title:"Gray",
+				active: false
+			},
+			{
+				title:"Black",
+				active: false
+			}
 		]
 	});
     var SizeView = Backbone.View.extend ({
