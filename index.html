@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title> Backbone </title>
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body>
+	<div class="wrapper">
+		<div class="container">
+			<div class="pdpcontainer" id="pdpcontainer">
+				<div class="product-image">
+					<div class="img-wrapper">
+						<img src="images/cellphone.jpg" alt="">
+					</div>
+				</div>
+				<div class="product-details">
+					<div class="product-title">
+						<h3>One plus 3T</h3>
+					</div>
+					<div class="product-size swatch"></div>
+					<div class="product-color swatch"></div>
+					<div class="swatch product-qty">
+						<div class="lbl-qty pull-left swatch-label">
+							<h4> Quantity : </h4>
+						</div>
+						<div class="qtybox pull-left swatch-content">
+							<input type="text" value="1">
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+				<div class="shipping-address">
+					
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			
+		</div>
+		<div id="container" class="container hidden">
+			<div class="jumbotron" id="page-title">
+				
+			</div>
+		</div>
+	</div>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script> -->
+<script src="js/underscore-min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/backbone-min.js"></script>
+
+
+<script type="text/template" id="size-view">
+	<div class="lbl-size pull-left swatch-label">
+		<h4> Size : </h4>
+	</div>
+	<div class="options-size pull-left swatch-content">
+		<ul>
+			<% _.each(sizes, function(size){ %>
+	            <li> <a href="">  <%= size %> </a></li>
+	        <% }); %>
+			
+		</ul>
+	</div>
+	<div class="clearfix"></div>
+</script>
+<script type="text/template" id="color-view">
+	<div class="lbl-color pull-left swatch-label">
+		<h4> Color : </h4>
+	</div>
+	<div class="options-color pull-left swatch-content">
+		<ul>
+			<% _.each(colors, function(color){ %>
+	            <li style="border-color:<%= color %>;"> <a href="" style="background:<%= color %>;">  <%= color %> </a></li>
+	        <% }); %>
+		</ul>
+	</div>
+	<div class="clearfix"></div>
+</script>
+<script type = "text/javascript">
+	var model = Backbone.Model.extend({});
+	var productData = new model({
+		title:"One Plus 3T",
+		sizes:[
+			"XS",
+			"S",
+			"M",
+			"L",
+			"XL"
+		],
+		colors:[
+			"goldenrod",
+			"Gray",
+			"Black"
+		]
+	});
+    var SizeView = Backbone.View.extend ({
+        el: '.product-size',
+        template: _.template( $('#size-view').html()),
+        initialize: function() {
+           this.render(); 
+        }, 
+        render: function() {
+           var htmlOutput = this.template(this.model.toJSON());
+           this.$el.html(htmlOutput);
+           return this;
+        }
+     });
+     
+    var ColorView = Backbone.View.extend ({
+        el: '.product-color',
+        template: _.template( $('#color-view').html()),
+        initialize: function() {
+           this.render(); 
+        }, 
+        render: function() {
+           var htmlOutput = this.template(this.model.toJSON());
+           this.$el.html(htmlOutput);
+           return this;
+        }
+    });
+    var sizeView = new SizeView({
+     	model:productData
+    });
+    var colorView = new ColorView({
+     	model:productData
+    });
+</script>
+</body>
+</html>
