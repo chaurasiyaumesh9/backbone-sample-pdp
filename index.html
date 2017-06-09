@@ -15,33 +15,9 @@
 						<img src="images/cellphone.jpg" alt="">
 					</div>
 				</div>
-				<div class="product-details">
-					<div class="product-title">
-						<h3>One plus 3T</h3>
-					</div>
-					<div class="product-size swatch"></div>
-					<div class="product-color swatch"></div>
-					<div class="swatch product-qty">
-						<div class="lbl-qty pull-left swatch-label">
-							<h4> Quantity : </h4>
-						</div>
-						<div class="qtybox pull-left swatch-content">
-							<input type="text" value="1">
-							<button class="btn btn-primary btn-add-to-cart" > Add to Cart </button>
-						</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-				<div class="shipping-address">
-					
-				</div>
-				<div class="clearfix"></div>
-			</div>
-			
-		</div>
-		<div id="container" class="container hidden">
-			<div class="jumbotron" id="page-title">
+				<div class="product-details"></div>
 				
+				<div class="clearfix"></div>
 			</div>
 		</div>
 	</div>
@@ -54,7 +30,51 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/backbone-min.js"></script>
 
-
+<script type="text/template" id="details-view">
+	<form action="/getData" method="POST" id="pdpform">
+		<div class="product-title">
+			<h3> <%= title %></h3>
+		</div>
+		<div class="product-size swatch"></div>
+		<div class="product-color swatch"></div>
+		<div class="swatch product-qty">
+			<div class="lbl-qty pull-left swatch-label">
+				<h4> Quantity : </h4>
+			</div>
+			<div class="qtybox pull-left swatch-content">
+				<input type="text" value="1">
+				<button class="btn btn-primary btn-add-to-cart hidden" > Add to Cart </button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="shipping-address"></div>
+	</form>
+</script>
+<script type="text/template" id="address-view">
+	<div class="shipping-container <%= validationSuccess?'':'hidden' %>">
+		<div class="form-group">
+			<label for="txt-address-1" class="lbl-address"> Address 1 </label>
+			<input type="text" id="txt-address-1" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="txt-address-2" class="lbl-address"> Address 2 </label>
+			<input type="text" id="txt-address-2" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="txt-city" class="lbl-address"> City </label>
+			<input type="text" id="txt-city" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="txt-state" class="lbl-address"> State </label>
+			<input type="text" id="txt-state" class="form-control">
+		</div>
+		<div class="form-group">
+			<label for="txt-zipcode" class="lbl-address"> Zip Code </label>
+			<input type="text" id="txt-zipcode" class="form-control">
+		</div>
+		<button type="submit" class="btn btn-default">Submit</button>
+	</div>
+</script>
 <script type="text/template" id="size-view">
 	<div class="lbl-size pull-left swatch-label">
 		<h4> Size : </h4>
@@ -83,9 +103,23 @@
 	<div class="clearfix"></div>
 </script>
 <script type = "text/javascript">
-	var model = Backbone.Model.extend({});
+	var model = Backbone.Model.extend({
+		defaults:{
+			title:null,
+			sizes:[],
+			colors:[],
+			validationSuccess: false
+		},
+		initialize: function(){
+			this.on('change',this.notify, this);
+		},
+		notify: function(){
+			//console.log('notify',this.colors);
+		}
+	});
 	var productData = new model({
 		title:"One Plus 3T",
+		validationSuccess: false,
 		sizes:[
 			{
 				title: "XS",
@@ -126,10 +160,31 @@
     var SizeView = Backbone.View.extend ({
         el: '.product-size',
         template: _.template( $('#size-view').html()),
+        events:{
+        	"click .options-size.swatch-content ul > li > a" :"sizeSelection",
+        },
+        sizeSelection: function(e){
+        	if (!e) { return;};
+        	var index = jQuery(e.target.parentElement).index();
+        	//console.log(this.model.get('sizes'))
+        	_.each(this.model.get('sizes'), function( obj ){ 
+        		//console.log('obj : ',obj)
+        		return obj.active = false; 
+        	});
+        	var arr = JSON.parse(JSON.stringify(this.model.get('sizes'))); //decoupling array references to triger change on model
+        	arr[index]['active'] = true;
+        	this.model.set('sizes',arr);
+        	return false;
+        },
         initialize: function() {
+        	var self = this;
+        	this.listenTo(this.model, 'change', function(){
+        		self.render();
+        	});
            this.render(); 
         }, 
         render: function() {
+        	//console.log('child 1 :',this.model);
            var htmlOutput = this.template(this.model.toJSON());
            this.$el.html(htmlOutput);
            return this;
@@ -139,19 +194,111 @@
     var ColorView = Backbone.View.extend ({
         el: '.product-color',
         template: _.template( $('#color-view').html()),
+        events:{
+        	"click .options-color.swatch-content ul > li > a" :"colorSelection",
+        },
+        colorSelection: function(e){
+        	if (!e) { return;};
+        	var index = jQuery(e.target.parentElement).index();
+        	_.each(this.model.get('colors'), function( obj ){ 
+        		//console.log('obj : ',obj)
+        		return obj.active = false; 
+        	});
+        	var arr = JSON.parse(JSON.stringify(this.model.get('colors'))); //decoupling array references to triger change on model
+        	arr[index]['active'] = true;
+        	this.model.set('colors',arr);
+        	//this.model.get('colors')[index]['active'] = true;
+        	//this.model.trigger('change:colors',this.model); //triggering manually..need to find more
+        	return false;
+        },
         initialize: function() {
-           this.render(); 
+        	var self = this;
+        	this.listenTo(this.model, 'change', function(){
+        		self.render();
+        	});
+
+           	this.render(); 
         }, 
         render: function() {
-           var htmlOutput = this.template(this.model.toJSON());
-           this.$el.html(htmlOutput);
-           return this;
+        	//console.log('child 2 :',this.model);
+        	var htmlOutput = this.template(this.model.toJSON());
+           	this.$el.html(htmlOutput);
+           	return this;
         }
     });
-    var sizeView = new SizeView({
-     	model:productData
+
+	var AddressView = Backbone.View.extend ({
+        el: '.shipping-address',
+        template: _.template( $('#address-view').html()),
+        events:{
+        	
+        },
+        initialize: function() {
+        	var self = this;
+        	this.listenTo(this.model, 'change', function(){
+        		self.render();
+        	});
+
+           	this.render(); 
+        }, 
+        render: function() {
+        	//console.log('child 3 :',this.model);
+        	var htmlOutput = this.template(this.model.toJSON());
+           	this.$el.html(htmlOutput);
+           	return this;
+        }
     });
-    var colorView = new ColorView({
+
+
+    var DetailsView = Backbone.View.extend({
+    	el:".product-details",
+    	template: _.template( $('#details-view').html()),
+    	events:{
+    		"submit #pdpform" : "showUserData"
+    	},
+        initialize: function() {
+        	//this.listenTo(this.model, 'sync', this.render);
+        	this.model.on('change',this.checkModel, this);
+        	this.render(); 
+           	this.sizeView = new SizeView({model: this.model});
+           	this.colorView = new ColorView({model: this.model});
+           	this.addressView = new AddressView({model: this.model});
+           	
+        },
+        showUserData:function(){
+        	return false;
+        },
+        checkModel: function(){
+        	this.model.set('validationSuccess',this.validate(),{silent:true}) ; //to prevent recursion mute event
+        	//console.log(this.model);
+        },
+        validate: function(){
+        	return this.validateColors() && this.validateSizes();
+        },
+        validateSizes: function(){
+        	for( var i=0; i<this.model.get('sizes').length; i++){
+        		var size = this.model.get('sizes')[i];
+        		if (size.active) {return true};
+        	}
+        	return false;
+        },
+        validateColors: function(){
+        	for( var i=0; i<this.model.get('colors').length; i++){
+        		var color = this.model.get('colors')[i];
+        		if (color.active) {return true};
+        	}
+        	return false;
+        },
+        render: function() {
+        	//console.log('parent :',this.model);
+           	//this.$el.html(this.template());
+           	var htmlOutput = this.template(this.model.toJSON());
+           	this.$el.html(htmlOutput);
+           	return this;
+        }
+    });
+
+    var detailsView = new DetailsView({
      	model:productData
     });
 </script>
